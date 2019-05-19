@@ -2,6 +2,7 @@ var express     = require("express"),
     app         = express(),
     bodyParser  = require("body-parser"),
     mongoose    = require("mongoose"),
+    flash       = require("connect-flash"),
     passport    = require("passport"),
     LocalStrategy = require("passport-local"),
     methodOverride = require("method-override"),
@@ -17,11 +18,12 @@ var commentRoutes    = require("./routes/comments"),
     indexRoutes      = require("./routes/index");
     
 
-mongoose.connect("mongodb://localhost/yelp_camp_v10", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost/yelp_camp_v10", { useNewUrlParser: true, useFindAndModify: false });
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
+app.use(flash());
 // seedDB();
 
 // PASSPORT CONFIGURATION
@@ -39,6 +41,8 @@ passport.deserializeUser(User.deserializeUser());
 //
 app.use(function(req, res, next){
    res.locals.currentUser = req.user;
+   res.locals.error = req.flash("error");
+   res.locals.success = req.flash("success");
    next();
 });
 
